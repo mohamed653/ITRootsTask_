@@ -1,0 +1,137 @@
+﻿@model IEnumerable<ITRootsTask.Models.User>
+@{
+    ViewData["Title"] = "Index";
+}
+<!-- Search Button -->
+<div class=" container w-25">
+    <form asp-action="SearchUser" asp-controller="Home" method="post">
+        <div class="input-group mb-3 ">
+
+            <input type="text" id="inputsearch" name="inputsearch" value="" class="form-control rounded" style="width: 150px;" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+            <button id="searchButton" type="submit" class="btn btn-primary"> <i class="fas fa-search"></i></button>
+        </div>
+    </form>
+    <!-- Create New User Button that responds to partial view -->
+    <div class="input-group mb-3 justify-content-center ">
+        <button id="createButton" class="btn btn-primary" asp-action="Create">Create New User</button>
+    </div>
+</div>
+
+<!-- Edit  User that responds to partial view -->
+<div id="EditpartialView">
+
+    @*@await Html.PartialAsync("_EditUser",new ITRootsTask.Models.User())*@
+</div>
+
+<div id="contentToPdf">
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserType)
+            </th>
+
+            <th>
+                Edit User
+            </th>
+            <th>
+                Delete User
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FullName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Phone)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserType)
+                    </td>
+                    <td>
+                        <input type="hidden" id="hiddenInput" value="@item.Id">
+                        <button class="editButton btn btn-success"> Edit</button>
+                    </td>
+                    <td>
+                        <form asp-action="DeleteUser" asp-controller="Home" asp-route-id="@item.Id" method="post">
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+</div>
+
+@if (!Model.Any())
+{
+    <h3 class="text text-danger text-center">No Result Found !</h3>
+}
+
+<button id="btnExport" class="btn btn-primary">Export to PDF</button>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function () {
+
+            $('.editButton').click(function (event) {
+
+                var userId = $(this).closest('tr').find('input[type="hidden"]').val();
+                console.log(userId);
+                $('#EditpartialView').load('@Url.Action("EditUserPartial", "Home")', { id: userId });
+            });;
+
+            $('#createButton').click(function (event) {
+                $('#EditpartialView').load('@Url.Action("EditUserPartial", "Home")');
+            });
+
+        });
+        $(function () {
+            // add click event handler to "Download PDF" button
+            $('#btnExport').click(function () {
+                // get the HTML content of the table
+                var content = $('#contentToPdf').html();
+                // create a new PDF document with html2pdf
+                html2pdf().from(content).set({
+                    margin: [30, 10, 5, 10],
+                    pagebreak: { avoid: 'tr' },
+                    jsPDF: { orientation: 'landscape', unit: 'pt', format: 'letter', compressPDF: true }
+                }).save();
+            });
+        });
+    </script>
+}

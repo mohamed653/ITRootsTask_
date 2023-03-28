@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ITRootsTask.Models.Invoice>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2 class="text text-center text-muted">Invoices</h2>
+
+<div>
+    <a id="createButton" class="btn btn-primary mb-3" @*asp-action="CreateInvoice"*@>Create New Invoice</a>
+</div>
+<div id="CreatepartialView">
+    <!-- This the the create partial view-->
+</div>
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>Products</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var invoice in Model)
+        {
+            <tr>
+                <td> @Html.DisplayFor(modelItem => invoice.Name) </td>
+                <td>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th> Name</th>
+                                <th> Quantity</th>
+                                <th> Price</th>
+                            </tr>
+                        </thead>
+                        @foreach (var product in invoice.Products)
+                        {
+                            <tr>
+                                <td> @Html.DisplayFor(modelItem => product.ProductName) </td>
+                                <td> @Html.DisplayFor(modelItem => product.Quantity) </td>
+                                <td> @Html.DisplayFor(modelItem => product.Price) </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#createButton').click(function (event) {
+                console.log("HI");
+                $('#CreatepartialView').load('@Url.Action("CreateInvoicePartial", "Invoice")');
+            });
+        });
+    </script>
+}
